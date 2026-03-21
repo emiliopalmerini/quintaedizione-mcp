@@ -1,0 +1,10 @@
+quintaedizione-mcp
+*.exe
+*.test
+*.out
+go.work
+go.work.sum
+.env
+.DS_Store
+.claude/
+__pycache__/

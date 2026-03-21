@@ -2,104 +2,48 @@
 
 ## Status
 
-Accepted
+Accepted (supersedes previous TypeScript layered architecture)
 
 ## Context
 
-We need to decide how to structure the Bun TypeScript MCP server. The existing Go projects follow hexagonal architecture with clear domain/application/adapter separation. We need to balance architectural rigor with the simpler nature of this project — it's a read-only data server with no mutations, no external APIs, and no persistence layer beyond static JSON files.
-
-### Options Considered
-
-1. **Full hexagonal architecture** — ports, adapters, domain, application layers (mirrors Go projects)
-2. **Flat structure** — single directory with all files
-3. **Layered by responsibility** — data loading, content types, tools, search
+We need to structure the Go MCP server. It is a thin adapter that exposes the shared module's data via MCP tools. There is no domain logic beyond what the shared module provides.
 
 ## Decision
 
-Use a **lightweight layered architecture** organized by responsibility, not full hexagonal.
-
-## Rationale
-
-This server is fundamentally a read-only data query layer. There are no mutations, no external service calls, no complex domain logic. Full hexagonal architecture would add ceremony without value. Instead, we organize by what the code does:
+Use a **flat, minimal architecture**. The MCP server is a single `main.go` with tool handler files.
 
 ```
 quintaedizione-mcp/
-├── src/
-│   ├── index.ts              # Entry point: create server, register tools, serve stdio
-│   ├── server.ts             # MCP server setup and tool registration
-│   ├── data/
-│   │   └── loader.ts         # Load and index JSON files at startup
-│   ├── content/
-│   │   ├── types.ts          # TypeScript interfaces for all content types
-│   │   ├── spells.ts         # Spell search/get logic
-│   │   ├── monsters.ts       # Monster search/get logic
-│   │   ├── equipment.ts      # Equipment search/get logic
-│   │   ├── magic-items.ts    # Magic item search/get logic
-│   │   ├── feats.ts          # Feat search/get logic
-│   │   ├── classes.ts        # Class list/get logic
-│   │   ├── backgrounds.ts    # Background list/get logic
-│   │   ├── species.ts        # Species list/get logic
-│   │   ├── rules.ts          # Rules search logic
-│   │   └── glossary.ts       # Glossary lookup logic
-│   ├── search/
-│   │   └── fuzzy.ts          # Shared fuzzy search utilities
-│   └── tools/
-│       ├── spells.ts         # Spell tool definitions (schema + handler)
-│       ├── monsters.ts       # Monster tool definitions
-│       ├── equipment.ts      # Equipment tool definitions
-│       ├── magic-items.ts    # Magic item tool definitions
-│       ├── feats.ts          # Feat tool definitions
-│       ├── classes.ts        # Class tool definitions
-│       ├── backgrounds.ts    # Background tool definitions
-│       ├── species.ts        # Species tool definitions
-│       ├── rules.ts          # Rules tool definitions
-│       └── glossary.ts       # Glossary tool definitions
-├── data/                     # Copied SRD JSON files (see ADR-003)
-│   ├── spells.json
-│   ├── monsters.json
-│   ├── classes.json
-│   ├── equipment.json
-│   ├── magic_items.json
-│   ├── feats.json
-│   ├── backgrounds.json
-│   ├── species.json
-│   ├── glossary.json
-│   ├── rules_gameplay.json
-│   ├── rules_creation.json
-│   └── rules_tools.json
-├── scripts/
-│   └── sync-data.sh          # Copy JSON from quintaedizione.online
-├── tests/
-│   ├── content/              # Unit tests for content modules
-│   └── tools/                # Integration tests for tool handlers
+├── main.go                # Entry point: load store, register tools, serve stdio
+├── tools/
+│   ├── spells.go          # Spell search/get tool handlers
+│   ├── monsters.go        # Monster search/get tool handlers
+│   ├── classes.go         # Class list/get tool handlers
+│   ├── equipment.go       # Equipment search/get tool handlers
+│   ├── magic_items.go     # Magic item search/get tool handlers
+│   ├── feats.go           # Feat search/get tool handlers
+│   ├── backgrounds.go     # Background list/get tool handlers
+│   ├── species.go         # Species list/get tool handlers
+│   ├── rules.go           # Rules search tool handlers
+│   ├── glossary.go        # Glossary lookup tool handlers
+│   ├── maps.go            # Map gallery tool handlers
+│   └── generators.go      # Random generator tool handlers
 ├── docs/
-│   └── adr/                  # Architecture Decision Records
-├── package.json
-├── tsconfig.json
-└── CLAUDE.md                 # Project instructions for Claude Code
+│   └── adr/               # Architecture Decision Records
+├── go.mod
+├── Makefile
+└── CLAUDE.md
 ```
 
-### Layer Responsibilities
+## Rationale
 
-| Layer | Purpose |
-|-------|---------|
-| `data/loader.ts` | Reads JSON files at startup, builds in-memory indexes (by ID, by name). Single load, immutable after init. |
-| `content/*.ts` | Pure functions that query the in-memory data. Each module owns search/filter/get logic for its content type. No framework dependencies. |
-| `search/fuzzy.ts` | Shared search utilities: case-insensitive matching, substring search, result limiting. |
-| `tools/*.ts` | MCP tool definitions: Zod schemas for inputs, handler functions that call content modules and format MCP responses. |
-| `server.ts` | Wires tools to the MCP server instance. |
-| `index.ts` | Composition root: loads data, creates server, starts stdio transport. |
-
-### Key Principles
-
-1. **Content modules are framework-free** — they take typed inputs and return typed outputs; no MCP SDK dependency. This makes them independently testable.
-2. **Tool modules are thin adapters** — they define Zod schemas, call content functions, and format `CallToolResult` responses.
-3. **Data is loaded once** — all JSON is read at startup into memory. No lazy loading, no file I/O during tool calls.
-4. **No over-abstraction** — no repository interfaces, no dependency injection containers. Direct imports are fine for a read-only server.
+- **No domain logic** — the shared module owns data, search, and filtering
+- **Tool handlers are thin** — parse MCP input, call store methods, format response
+- **Single binary** — `go build` produces a self-contained executable
+- **No over-abstraction** — no interfaces, no DI, no layers. Direct store access.
 
 ## Consequences
 
-- Simple to understand and navigate; each file has a clear purpose
-- Content logic is testable without MCP SDK mocking
-- Adding a new content type requires: type definition, content module, tool module, loader entry
-- Not as rigorous as the Go projects' hexagonal architecture (acceptable — this is a simpler system)
+- Simple to understand — each tool file maps 1:1 to an MCP tool
+- Adding a new tool: one file in `tools/`, register in `main.go`
+- All complexity lives in the shared module, not here

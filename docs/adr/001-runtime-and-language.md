@@ -1,39 +1,31 @@
-# ADR-001: Bun as Runtime and TypeScript as Language
+# ADR-001: Go as Runtime and Language
 
 ## Status
 
-Accepted
+Accepted (supersedes previous Bun/TypeScript decision)
 
 ## Context
 
-We need to build an MCP (Model Context Protocol) server that exposes D&D SRD 2024 content to Claude Code. The existing ecosystem includes:
-
-- **quintaedizione.online** — a Go + Templ web viewer serving Italian SRD content from embedded JSON
-- **due-draghi-combattimenti** — a Go encounter calculator with an MCP server using `github.com/modelcontextprotocol/go-sdk`
-
-The MCP protocol originated from Anthropic and the reference SDK is TypeScript-first. We need to choose a runtime and language for the new server.
+We need to build an MCP server that exposes D&D SRD 2024 content to Claude Code. The `quintaedizione-data-ita` shared Go module provides typed structs, embedded JSON, search, and filtering — ready to consume.
 
 ### Options Considered
 
-1. **Go** — consistent with existing projects; uses `modelcontextprotocol/go-sdk`
-2. **Node.js + TypeScript** — reference MCP SDK is TypeScript; large ecosystem
-3. **Bun + TypeScript** — fast TypeScript runtime with native TS support, built-in test runner, no transpile step
+1. **Go** — direct import of shared module, single binary, consistent ecosystem
+2. **Bun + TypeScript** — reference MCP SDK, but requires copying JSON data
 
 ## Decision
 
-Use **Bun** as the runtime and **TypeScript** as the language.
+Use **Go** as the language and compile to a single binary.
 
 ## Rationale
 
-- **First-class TypeScript** — Bun runs `.ts` files natively with no compilation step, reducing toolchain complexity (no `tsc`, `tsconfig` build paths, `ts-node`)
-- **MCP SDK alignment** — the official `@modelcontextprotocol/sdk` is written in TypeScript; using TS gives us the best type safety and SDK integration
-- **Fast startup** — Bun's startup time is significantly lower than Node.js, which matters for an MCP server that Claude Code spawns as a subprocess on demand
-- **Built-in tooling** — `bun test`, `bun install`, and native JSON imports reduce external dependencies
-- **JSON-heavy workload** — the server loads and serves JSON data; Bun's optimized JSON parsing is a natural fit
-- **Diversification** — the existing projects are Go; using TypeScript for the MCP server brings variety to the stack and leverages the stronger MCP TypeScript ecosystem
+- **Direct import** of `quintaedizione-data-ita` — no data duplication, typed access to all SRD entities
+- **Single static binary** — trivial deployment, no runtime dependencies
+- **Consistent ecosystem** — same language as quintaedizione.online, same team knowledge
+- **MCP Go SDK** available (`github.com/mark3labs/mcp-go`)
+- **Fast startup**, low memory footprint
 
 ## Consequences
 
-- Team needs TypeScript familiarity (already common in web development)
-- Bun is newer than Node.js; some npm packages may have edge-case incompatibilities (mitigated by the small dependency surface of this project)
-- Cannot share code directly with the Go projects (acceptable — the data contract is the shared JSON files)
+- Cannot use the official TypeScript MCP SDK (acceptable — Go SDK is mature)
+- Shared module updates propagate via `go get -u`
