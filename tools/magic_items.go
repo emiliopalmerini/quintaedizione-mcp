@@ -72,8 +72,8 @@ func getMagicItemHandler(data *store.Store) server.ToolHandlerFunc {
 			}
 			fmt.Fprintf(&sb, "**%s**\n", att)
 		}
-		if mi.Description != "" {
-			fmt.Fprintf(&sb, "\n%s", mi.Description)
+		if len(mi.Description) > 0 {
+			fmt.Fprintf(&sb, "\n%s", mi.Description.PlainText())
 		}
 		return mcp.NewToolResultText(sb.String()), nil
 	}

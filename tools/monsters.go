@@ -124,6 +124,6 @@ func writeFeatures(sb *strings.Builder, title string, features []srd.Feature) {
 	}
 	fmt.Fprintf(sb, "## %s\n\n", title)
 	for _, f := range features {
-		fmt.Fprintf(sb, "**%s.** %s\n\n", f.Name, f.Description)
+		fmt.Fprintf(sb, "**%s.** %s\n\n", f.Name, f.Description.PlainText())
 	}
 }

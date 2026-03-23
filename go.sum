@@ -6,6 +6,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/emiliopalmerini/quintaedizione-data-ita v0.0.0-20260321151436-4d75da248382 h1:8yIDGcjBwzmwVlMgi7bhC+MDQ+HCEMll07trn9+mYmk=
 github.com/emiliopalmerini/quintaedizione-data-ita v0.0.0-20260321151436-4d75da248382/go.mod h1:yAf2syrnn86z5DZ1sRKEBSw9hoL7vMv26cuoMej7E74=
+github.com/emiliopalmerini/quintaedizione-data-ita v0.0.0-20260323103031-5bfd65d12a94 h1:6uzYFi1lF3a+EwlJUUYOL8JuxOYHhiAJ7IFAJ4zR5AM=
+github.com/emiliopalmerini/quintaedizione-data-ita v0.0.0-20260323103031-5bfd65d12a94/go.mod h1:yAf2syrnn86z5DZ1sRKEBSw9hoL7vMv26cuoMej7E74=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=

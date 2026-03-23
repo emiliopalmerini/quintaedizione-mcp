@@ -94,9 +94,9 @@ func getSpellHandler(data *store.Store) server.ToolHandlerFunc {
 		fmt.Fprintf(&sb, "**Componenti:** %s\n", spell.Components)
 		fmt.Fprintf(&sb, "**Durata:** %s\n", spell.Duration)
 		fmt.Fprintf(&sb, "**Classi:** %s\n\n", strings.Join(spell.Classes, ", "))
-		sb.WriteString(spell.Description)
-		if spell.AtHigherLevels != "" {
-			fmt.Fprintf(&sb, "\n\n**Ai Livelli Superiori:** %s", spell.AtHigherLevels)
+		sb.WriteString(spell.Description.PlainText())
+		if len(spell.AtHigherLevels) > 0 {
+			fmt.Fprintf(&sb, "\n\n**Ai Livelli Superiori:** %s", spell.AtHigherLevels.PlainText())
 		}
 		return mcp.NewToolResultText(sb.String()), nil
 	}

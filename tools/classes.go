@@ -51,19 +51,19 @@ func getClassHandler(data *store.Store) server.ToolHandlerFunc {
 		if c.Proficiencies != "" {
 			fmt.Fprintf(&sb, "**Competenze:** %s\n", c.Proficiencies)
 		}
-		if c.Description != "" {
-			fmt.Fprintf(&sb, "\n%s\n", c.Description)
+		if len(c.Description) > 0 {
+			fmt.Fprintf(&sb, "\n%s\n", c.Description.PlainText())
 		}
 		if len(c.Features) > 0 {
 			sb.WriteString("\n## Privilegi\n\n")
 			for _, f := range c.Features {
-				fmt.Fprintf(&sb, "**%s (Livello %d).** %s\n\n", f.Name, f.Level, f.Description)
+				fmt.Fprintf(&sb, "**%s (Livello %d).** %s\n\n", f.Name, f.Level, f.Description.PlainText())
 			}
 		}
 		if len(c.Subclasses) > 0 {
 			sb.WriteString("## Sottoclassi\n\n")
 			for _, sc := range c.Subclasses {
-				fmt.Fprintf(&sb, "### %s\n\n%s\n\n", sc.Name, sc.Description)
+				fmt.Fprintf(&sb, "### %s\n\n%s\n\n", sc.Name, sc.Description.PlainText())
 			}
 		}
 		return mcp.NewToolResultText(sb.String()), nil

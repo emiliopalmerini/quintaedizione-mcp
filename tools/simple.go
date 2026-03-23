@@ -53,13 +53,13 @@ func registerFeats(s *server.MCPServer, data *store.Store) {
 		}
 		var sb strings.Builder
 		fmt.Fprintf(&sb, "# %s\n\n**Categoria:** %s\n", f.Name, f.Category)
-		if f.Prerequisite != "" {
-			fmt.Fprintf(&sb, "**Prerequisito:** %s\n", f.Prerequisite)
+		if len(f.Prerequisite) > 0 {
+			fmt.Fprintf(&sb, "**Prerequisito:** %s\n", f.Prerequisite.PlainText())
 		}
 		if f.Repeatable {
 			sb.WriteString("**Ripetibile:** Sì\n")
 		}
-		fmt.Fprintf(&sb, "\n%s", f.Benefit)
+		fmt.Fprintf(&sb, "\n%s", f.Benefit.PlainText())
 		return mcp.NewToolResultText(sb.String()), nil
 	})
 }
@@ -105,8 +105,8 @@ func registerBackgrounds(s *server.MCPServer, data *store.Store) {
 		if b.Equipment != "" {
 			fmt.Fprintf(&sb, "**Equipaggiamento:** %s\n", b.Equipment)
 		}
-		if b.Description != "" {
-			fmt.Fprintf(&sb, "\n%s", b.Description)
+		if len(b.Description) > 0 {
+			fmt.Fprintf(&sb, "\n%s", b.Description.PlainText())
 		}
 		return mcp.NewToolResultText(sb.String()), nil
 	})
@@ -142,12 +142,12 @@ func registerSpecies(s *server.MCPServer, data *store.Store) {
 		var sb strings.Builder
 		fmt.Fprintf(&sb, "# %s\n\n", sp.Name)
 		fmt.Fprintf(&sb, "**Tipo:** %s | **Taglia:** %s | **Velocità:** %s\n\n", sp.CreatureType, sp.Size, sp.Speed)
-		if sp.Description != "" {
-			sb.WriteString(sp.Description)
+		if len(sp.Description) > 0 {
+			sb.WriteString(sp.Description.PlainText())
 			sb.WriteString("\n\n")
 		}
 		for _, t := range sp.Traits {
-			fmt.Fprintf(&sb, "**%s.** %s\n\n", t.Name, t.Description)
+			fmt.Fprintf(&sb, "**%s.** %s\n\n", t.Name, t.Description.PlainText())
 		}
 		return mcp.NewToolResultText(sb.String()), nil
 	})
@@ -166,7 +166,7 @@ func registerRules(s *server.MCPServer, data *store.Store) {
 		}
 		var results []string
 		for _, r := range data.Rules() {
-			if containsI(r.Title, query) || containsI(r.Content, query) {
+			if containsI(r.Title, query) || containsI(r.Content.PlainText(), query) {
 				results = append(results, fmt.Sprintf("- **%s** [ID: %s]", r.Title, r.ID))
 				if len(results) >= 20 {
 					break
@@ -192,7 +192,7 @@ func registerRules(s *server.MCPServer, data *store.Store) {
 			return mcp.NewToolResultError(fmt.Sprintf("Rule not found: %s", id)), nil
 		}
 		var sb strings.Builder
-		fmt.Fprintf(&sb, "# %s\n\n%s", r.Title, r.Content)
+		fmt.Fprintf(&sb, "# %s\n\n%s", r.Title, r.Content.PlainText())
 		return mcp.NewToolResultText(sb.String()), nil
 	})
 }
@@ -211,7 +211,7 @@ func registerGlossary(s *server.MCPServer, data *store.Store) {
 		var results []string
 		for _, g := range data.Glossary() {
 			if containsI(g.Term, term) {
-				entry := fmt.Sprintf("**%s:** %s", g.Term, g.Definition)
+				entry := fmt.Sprintf("**%s:** %s", g.Term, g.Definition.PlainText())
 				if len(g.SeeAlso) > 0 {
 					entry += fmt.Sprintf(" (Vedi anche: %s)", strings.Join(g.SeeAlso, ", "))
 				}

@@ -63,8 +63,8 @@ func getEquipmentHandler(data *store.Store) server.ToolHandlerFunc {
 		for k, v := range e.Properties {
 			fmt.Fprintf(&sb, "**%s:** %s\n", k, v)
 		}
-		if e.Description != "" {
-			fmt.Fprintf(&sb, "\n%s", e.Description)
+		if len(e.Description) > 0 {
+			fmt.Fprintf(&sb, "\n%s", e.Description.PlainText())
 		}
 		return mcp.NewToolResultText(sb.String()), nil
 	}
