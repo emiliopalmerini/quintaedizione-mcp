@@ -16,7 +16,7 @@
           pname = "quintaedizione-mcp";
           version = "0.1.0";
           src = ./.;
-          vendorHash = "sha256-fOXb5YQuOrxbisFdD3jGOOGpH1ySt0HGCsskpazJ5BQ=";
+          vendorHash = "sha256-1KmCcX7n7KiqVCzWExjhKmfUXfdu+4PIx9npqjsvtLI=";
           meta = with pkgs.lib; {
             description = "MCP server for D&D 5e Italian SRD data";
             homepage = "https://github.com/emiliopalmerini/quintaedizione-mcp";
