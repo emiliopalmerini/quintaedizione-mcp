@@ -3,7 +3,7 @@ module github.com/emiliopalmerini/quintaedizione-mcp
 go 1.25.7
 
 require (
-	github.com/emiliopalmerini/quintaedizione-data-ita v0.0.0-20260323103031-5bfd65d12a94
+	github.com/emiliopalmerini/quintaedizione-data-ita v0.0.0-20260323113654-d175d9c502be
 	github.com/mark3labs/mcp-go v0.45.0
 )
 
