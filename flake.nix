@@ -14,9 +14,9 @@
       {
         packages.default = pkgs.buildGoModule {
           pname = "quintaedizione-mcp";
-          version = "0.1.0";
+          version = "0.2.0";
           src = ./.;
-          vendorHash = "sha256-1KmCcX7n7KiqVCzWExjhKmfUXfdu+4PIx9npqjsvtLI=";
+          vendorHash = "sha256-m0stKZX9nrgJcJSIsIOZhTAVLN22+AHANKzouXQBGVg=";
           meta = with pkgs.lib; {
             description = "MCP server for D&D 5e Italian SRD data";
             homepage = "https://github.com/emiliopalmerini/quintaedizione-mcp";
